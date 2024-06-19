@@ -1,2 +1,1 @@
-export * from "./iOSContactList"
-export * from "./interfaces"
+export * from "./IOSContactList";

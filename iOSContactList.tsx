@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react"
+import React, { useRef, useState } from "react";
 import {
   SectionList,
   GestureResponderEvent,
@@ -8,17 +8,17 @@ import {
   FlatList,
   TouchableOpacity,
   Text,
-} from "react-native"
+} from "react-native";
 
-import { Item } from "./interfaces"
-import { alphabetArray, size } from "./contants"
-import { _scrollToSection, groupItemsByOrganizer } from "./utils"
-import sectionListGetItemLayout from "react-native-section-list-get-item-layout"
-import { styles } from "./styles"
+import { Item } from "./interfaces";
+import { alphabetArray, size } from "./contants";
+import { _scrollToSection, groupItemsByOrganizer } from "./utils";
+import sectionListGetItemLayout from "react-native-section-list-get-item-layout";
+import { styles } from "./styles";
 
-export const iOSContactList = ({ data }: { data: Item[] }) => {
+export const IOSContactList = ({ data }: { data: Item[] }) => {
   // Refs
-  const listRef = useRef<SectionList<Item>>(null)
+  const listRef = useRef<SectionList<Item>>(null);
   const touchableOpacityRefs = useRef(
     new Map<
       string,
@@ -30,16 +30,18 @@ export const iOSContactList = ({ data }: { data: Item[] }) => {
             width: number,
             height: number,
             px: number,
-            py: number,
-          ) => void,
-        ) => void
+            py: number
+          ) => void
+        ) => void;
       }
-    >(),
-  ).current
+    >()
+  ).current;
 
   // States
-  const [lastSelectedSection, setLastSelectedSection] = useState<string | null>(null)
-  const [stickySectionHeader, setStickySectionHeader] = useState<string[]>([])
+  const [lastSelectedSection, setLastSelectedSection] = useState<string | null>(
+    null
+  );
+  const [stickySectionHeader, setStickySectionHeader] = useState<string[]>([]);
 
   /**
    * Scroll to the section by letter
@@ -47,32 +49,36 @@ export const iOSContactList = ({ data }: { data: Item[] }) => {
    * @param {GestureResponderEvent} event
    */
   const handleTouchMove = (event: GestureResponderEvent) => {
-    const { pageX: x, pageY: y } = event.nativeEvent
+    const { pageX: x, pageY: y } = event.nativeEvent;
     touchableOpacityRefs.forEach((ref, key) => {
       ref.measure((fx, fy, width, height, px, py) => {
         if (x >= px && x <= px + width && y >= py && y <= py + height) {
           if (key !== lastSelectedSection) {
-            setLastSelectedSection(key)
-            _scrollToSection(key, listRef)
+            setLastSelectedSection(key);
+            _scrollToSection(key, listRef);
           }
         }
-      })
-    })
-  }
+      });
+    });
+  };
 
   /**
    * On viewable items changed
    *
    * @param {{ viewableItems: ViewToken[] }} { viewableItems }
    */
-  const onViewableItemsChanged = ({ viewableItems }: { viewableItems: ViewToken[] }) => {
+  const onViewableItemsChanged = ({
+    viewableItems,
+  }: {
+    viewableItems: ViewToken[];
+  }) => {
     const headers = viewableItems
       .filter((item) => item.isViewable && item.section)
-      .map((item) => item.section.title)
+      .map((item) => item.section.title);
 
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
-    setStickySectionHeader(headers[0])
-  }
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setStickySectionHeader(headers[0]);
+  };
 
   // Get item layout
   const _getItemLayout = sectionListGetItemLayout({
@@ -83,10 +89,10 @@ export const iOSContactList = ({ data }: { data: Item[] }) => {
     getSeparatorHeight: () => 0, // The height of your separators
     getSectionHeaderHeight: () => size.sectionHeaderHeight + 30, // The height of your section headers
     getSectionFooterHeight: () => 0, // The height of your section footers
-  })
+  });
 
   // Group items by organizer
-  const sections = groupItemsByOrganizer(data)
+  const sections = groupItemsByOrganizer(data);
 
   return (
     <View style={styles.container}>
@@ -136,7 +142,7 @@ export const iOSContactList = ({ data }: { data: Item[] }) => {
         />
       </View>
     </View>
-  )
-}
+  );
+};
 
-export default iOSContactList
+export default IOSContactList;

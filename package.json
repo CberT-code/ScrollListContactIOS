@@ -1,0 +1,30 @@
+{
+  "name": "ioscontactlist",
+  "version": "1.0.1",
+  "description": "This npm package provides a versatile and easy-to-use component that mimics the iOS Contacts app scroll list style. Ideal for developers looking to integrate a sleek and intuitive scrolling list interface into their applications, this component offers smooth scrolling, alphabetical sorting, and a familiar user experience that closely resembles the native iOS Contacts application.",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CberT-code/ScrollListContactIOS.git"
+  },
+  "keywords": [
+    "contact",
+    "ios",
+    "scrollList"
+  ],
+  "author": "cybert",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CberT-code/ScrollListContactIOS/issues"
+  },
+  "homepage": "https://github.com/CberT-code/ScrollListContactIOS#readme",
+  "dependencies": {
+    "expo-haptics": "~13.0.1",
+    "react": "18.2.0",
+    "react-native": "0.74.1",
+    "react-native-get-item-layout-section-list": "^0.1.0"
+  }
+}
