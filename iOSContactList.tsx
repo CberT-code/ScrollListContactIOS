@@ -67,18 +67,18 @@ export const IOSContactList = ({ data }: { data: Item[] }) => {
    *
    * @param {{ viewableItems: ViewToken[] }} { viewableItems }
    */
-  const onViewableItemsChanged = ({
-    viewableItems,
-  }: {
-    viewableItems: ViewToken[];
-  }) => {
-    const headers = viewableItems
-      .filter((item) => item.isViewable && item.section)
-      .map((item) => item.section.title);
+  // const onViewableItemsChanged = ({
+  //   viewableItems,
+  // }: {
+  //   viewableItems: ViewToken[];
+  // }) => {
+  //   const headers = viewableItems
+  //     .filter((item) => item.isViewable && item.section)
+  //     .map((item) => item.section.title);
 
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setStickySectionHeader(headers[0]);
-  };
+  //   LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+  //   setStickySectionHeader(headers[0]);
+  // };
 
   // Get item layout
   const _getItemLayout = sectionListGetItemLayout({
@@ -117,7 +117,7 @@ export const IOSContactList = ({ data }: { data: Item[] }) => {
         )}
         renderSectionFooter={() => <View style={styles.footer} />}
         getItemLayout={(data, index) => _getItemLayout(sections, index)}
-        onViewableItemsChanged={onViewableItemsChanged}
+        // onViewableItemsChanged={onViewableItemsChanged}
         style={styles.sectionList}
       />
       <View
