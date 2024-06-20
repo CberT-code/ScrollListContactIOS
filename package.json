@@ -1,6 +1,6 @@
 {
   "name": "ioscontactlist",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "This npm package provides a versatile and easy-to-use component that mimics the iOS Contacts app scroll list style. Ideal for developers looking to integrate a sleek and intuitive scrolling list interface into their applications, this component offers smooth scrolling, alphabetical sorting, and a familiar user experience that closely resembles the native iOS Contacts application.",
   "main": "index.ts",
   "scripts": {
@@ -25,6 +25,6 @@
     "expo-haptics": "~13.0.1",
     "react": "18.2.0",
     "react-native": "0.74.1",
-    "react-native-get-item-layout-section-list": "^0.1.0"
+    "react-native-section-list-get-item-layout": "^2.2.3"
   }
 }
