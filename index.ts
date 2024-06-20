@@ -1,1 +1,1 @@
-export * from "./IOSContactList";
+export * from "./ContactList";
