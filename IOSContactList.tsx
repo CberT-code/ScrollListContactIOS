@@ -16,7 +16,13 @@ import { _scrollToSection, groupItemsByOrganizer } from "./utils";
 import sectionListGetItemLayout from "react-native-section-list-get-item-layout";
 import { styles } from "./styles";
 
-export const IOSContactList = ({ data }: { data: Item[] }) => {
+export const IOSContactList = ({
+  data,
+  onItemPress,
+}: {
+  data: Item[];
+  onItemPress: any;
+}) => {
   // Refs
   const listRef = useRef<SectionList<Item>>(null);
   const touchableOpacityRefs = useRef(
@@ -140,9 +146,12 @@ export const IOSContactList = ({ data }: { data: Item[] }) => {
         sections={filteredSections}
         keyExtractor={(_, index) => index.toString()}
         renderItem={({ item }) => (
-          <View style={styles.itemContainer}>
+          <TouchableOpacity
+            style={styles.itemContainer}
+            onPress={() => onItemPress(item)}
+          >
             <Text style={styles.item}>{item.name ? item.name : item.key}</Text>
-          </View>
+          </TouchableOpacity>
         )}
         renderSectionHeader={({ section: { title } }) => (
           <View style={styles.sectionHeader}>
