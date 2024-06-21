@@ -18,10 +18,10 @@ import { styles } from "./styles";
 
 export const IOSContactList = ({
   data,
-  onItemPress,
+  onItemPress = () => {},
 }: {
   data: Item[];
-  onItemPress: any;
+  onItemPress?: any;
 }) => {
   // Refs
   const listRef = useRef<SectionList<Item>>(null);
