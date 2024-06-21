@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   SectionList,
   GestureResponderEvent,
@@ -10,7 +10,7 @@ import {
   Text,
 } from "react-native";
 
-import { Item } from "./interfaces";
+import { Item, Section } from "./interfaces";
 import { alphabetArray, size } from "./contants";
 import { _scrollToSection, groupItemsByOrganizer } from "./utils";
 import sectionListGetItemLayout from "react-native-section-list-get-item-layout";
@@ -41,7 +41,33 @@ export const IOSContactList = ({ data }: { data: Item[] }) => {
   const [lastSelectedSection, setLastSelectedSection] = useState<string | null>(
     null
   );
-  const [stickySectionHeader, setStickySectionHeader] = useState<string[]>([]);
+  // const [stickySectionHeader, setStickySectionHeader] = useState<string[]>([]);
+  const [filteredSections, setFilteredSections] = useState<Section[]>([]);
+  const [indexMapping, setIndexMapping] = useState<{ [key: string]: number }>(
+    {}
+  );
+
+  // Filter sections to remove empty ones and create index mapping
+  useEffect(() => {
+    const groupedItems = groupItemsByOrganizer(data);
+    const nonEmptySections = groupedItems.filter(
+      (section) => section.data.length > 0
+    );
+    setFilteredSections(nonEmptySections);
+
+    const newIndexMapping: { [key: string]: number } = {};
+    alphabetArray.forEach((letter) => {
+      const sectionIndex = nonEmptySections.findIndex(
+        (section) => section.title === letter
+      );
+      if (sectionIndex !== -1) {
+        newIndexMapping[letter] = sectionIndex;
+      } else {
+        newIndexMapping[letter] = -1;
+      }
+    });
+    setIndexMapping(newIndexMapping);
+  }, [data]);
 
   /**
    * Scroll to the section by letter
@@ -55,11 +81,27 @@ export const IOSContactList = ({ data }: { data: Item[] }) => {
         if (x >= px && x <= px + width && y >= py && y <= py + height) {
           if (key !== lastSelectedSection) {
             setLastSelectedSection(key);
-            _scrollToSection(key, listRef);
+            scrollToSection(key);
           }
         }
       });
     });
+  };
+
+  const scrollToSection = (letter: string) => {
+    let sectionIndex = indexMapping[letter];
+    if (sectionIndex === -1) {
+      // Find the next available section
+      const nextLetter = alphabetArray.findLast(
+        (nextLetter) =>
+          indexMapping[nextLetter] !== -1 &&
+          alphabetArray.indexOf(nextLetter) < alphabetArray.indexOf(letter)
+      );
+      sectionIndex = nextLetter ? indexMapping[nextLetter] : null;
+    }
+    if (sectionIndex !== null) {
+      _scrollToSection(alphabetArray[sectionIndex], listRef);
+    }
   };
 
   /**
@@ -91,14 +133,11 @@ export const IOSContactList = ({ data }: { data: Item[] }) => {
     getSectionFooterHeight: () => 0, // The height of your section footers
   });
 
-  // Group items by organizer
-  const sections = groupItemsByOrganizer(data);
-
   return (
     <View style={styles.container}>
       <SectionList
         ref={listRef}
-        sections={sections}
+        sections={filteredSections}
         keyExtractor={(_, index) => index.toString()}
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
@@ -106,17 +145,14 @@ export const IOSContactList = ({ data }: { data: Item[] }) => {
           </View>
         )}
         renderSectionHeader={({ section: { title } }) => (
-          <View
-            style={[
-              styles.sectionHeader,
-              stickySectionHeader.includes(title) && styles.stickySectionHeader,
-            ]}
-          >
+          <View style={styles.sectionHeader}>
             <Text style={styles.titleHeader}>{title}</Text>
           </View>
         )}
         renderSectionFooter={() => <View style={styles.footer} />}
-        getItemLayout={(data, index) => _getItemLayout(sections, index)}
+        getItemLayout={(section, index) =>
+          _getItemLayout(filteredSections, index)
+        }
         // onViewableItemsChanged={onViewableItemsChanged}
         style={styles.sectionList}
       />
@@ -133,7 +169,7 @@ export const IOSContactList = ({ data }: { data: Item[] }) => {
           renderItem={({ item }) => (
             <TouchableOpacity
               ref={(ref) => ref && touchableOpacityRefs.set(item, ref)}
-              onPress={() => _scrollToSection(item, listRef)}
+              onPress={() => scrollToSection(item)}
             >
               <Text style={styles.alphabetItem}>{item.toUpperCase()}</Text>
             </TouchableOpacity>
