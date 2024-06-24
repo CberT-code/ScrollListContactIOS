@@ -2,8 +2,6 @@ import React, { useRef, useState, useEffect } from "react";
 import {
   SectionList,
   GestureResponderEvent,
-  ViewToken,
-  LayoutAnimation,
   View,
   FlatList,
   TouchableOpacity,
@@ -19,9 +17,11 @@ import { styles } from "./styles";
 export const IOSContactList = ({
   data,
   onItemPress = () => {},
+  ASC = true,
 }: {
   data: Item[];
   onItemPress?: any;
+  ASC?: boolean;
 }) => {
   // Refs
   const listRef = useRef<SectionList<Item>>(null);
@@ -47,22 +47,29 @@ export const IOSContactList = ({
   const [lastSelectedSection, setLastSelectedSection] = useState<string | null>(
     null
   );
-  // const [stickySectionHeader, setStickySectionHeader] = useState<string[]>([]);
   const [filteredSections, setFilteredSections] = useState<Section[]>([]);
   const [indexMapping, setIndexMapping] = useState<{ [key: string]: number }>(
     {}
   );
+  const [alphabet, setAlphabet] = useState(
+    ASC ? [...alphabetArray] : [...alphabetArray].reverse()
+  );
+
+  // Update alphabet when ASC changes
+  useEffect(() => {
+    setAlphabet(ASC ? [...alphabetArray] : [...alphabetArray].reverse());
+  }, [ASC]);
 
   // Filter sections to remove empty ones and create index mapping
   useEffect(() => {
-    const groupedItems = groupItemsByOrganizer(data);
+    const groupedItems = groupItemsByOrganizer(data, alphabet);
     const nonEmptySections = groupedItems.filter(
       (section) => section.data.length > 0
     );
     setFilteredSections(nonEmptySections);
 
     const newIndexMapping: { [key: string]: number } = {};
-    alphabetArray.forEach((letter) => {
+    alphabet.forEach((letter) => {
       const sectionIndex = nonEmptySections.findIndex(
         (section) => section.title === letter
       );
@@ -73,7 +80,7 @@ export const IOSContactList = ({
       }
     });
     setIndexMapping(newIndexMapping);
-  }, [data]);
+  }, [data, alphabet]);
 
   /**
    * Scroll to the section by letter
@@ -98,15 +105,15 @@ export const IOSContactList = ({
     let sectionIndex = indexMapping[letter];
     if (sectionIndex === -1) {
       // Find the next available section
-      const nextLetter = alphabetArray.findLast(
+      const nextLetter = alphabet.findLast(
         (nextLetter) =>
           indexMapping[nextLetter] !== -1 &&
-          alphabetArray.indexOf(nextLetter) < alphabetArray.indexOf(letter)
+          alphabet.indexOf(nextLetter) < alphabet.indexOf(letter)
       );
-      sectionIndex = nextLetter ? indexMapping[nextLetter] : null;
+      sectionIndex = nextLetter ? indexMapping[nextLetter] : undefined;
     }
     if (sectionIndex !== null) {
-      _scrollToSection(alphabetArray[sectionIndex], listRef);
+      _scrollToSection(alphabet[sectionIndex], listRef, alphabet);
     }
   };
 
@@ -172,7 +179,7 @@ export const IOSContactList = ({
         onTouchEnd={() => setLastSelectedSection(null)}
       >
         <FlatList
-          data={alphabetArray}
+          data={alphabet}
           keyExtractor={(item) => item}
           scrollEnabled={false}
           renderItem={({ item }) => (
