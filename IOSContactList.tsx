@@ -6,6 +6,7 @@ import {
   FlatList,
   TouchableOpacity,
   Text,
+  RefreshControl,
 } from "react-native";
 
 import { Item, Section } from "./interfaces";
@@ -18,10 +19,14 @@ export const IOSContactList = ({
   data,
   onItemPress = () => {},
   ASC = true,
+  refreshing = false,
+  onRefresh = () => {},
 }: {
   data: Item[];
   onItemPress?: any;
   ASC?: boolean;
+  refreshing?: boolean;
+  onRefresh?: () => void;
 }) => {
   // Refs
   const listRef = useRef<SectionList<Item>>(null);
@@ -169,7 +174,9 @@ export const IOSContactList = ({
         getItemLayout={(section, index) =>
           _getItemLayout(filteredSections, index)
         }
-        // onViewableItemsChanged={onViewableItemsChanged}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
         style={styles.sectionList}
       />
       <View
