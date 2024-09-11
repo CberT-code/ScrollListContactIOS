@@ -11,22 +11,31 @@ import {
 
 import { Item, Section } from "./interfaces";
 import { alphabetArray, size } from "./contants";
-import { _scrollToSection, groupItemsByOrganizer } from "./utils";
+import {
+  _scrollToSection,
+  groupItemsByOrganizer,
+  groupItemsByState,
+} from "./utils";
 import sectionListGetItemLayout from "react-native-section-list-get-item-layout";
 import { styles } from "./styles";
 
+// Define a new property for state-based sorting
 export const IOSContactList = ({
   data,
   onItemPress = () => {},
   ASC = true,
   refreshing = false,
   onRefresh = () => {},
+  sortByProp, // New prop to control sorting by prop
+  headerProp = false, // New prop to control sorting by prop
 }: {
   data: Item[];
   onItemPress?: any;
   ASC?: boolean;
   refreshing?: boolean;
   onRefresh?: () => void;
+  sortByProp?: string;
+  headerProp?: boolean; // New prop to control sorting by state
 }) => {
   // Refs
   const listRef = useRef<SectionList<Item>>(null);
@@ -65,30 +74,36 @@ export const IOSContactList = ({
     setAlphabet(ASC ? [...alphabetArray] : [...alphabetArray].reverse());
   }, [ASC]);
 
-  // Filter sections to remove empty ones and create index mapping
+  // Filter and group items by state or by alphabet depending on sortByProp
   useEffect(() => {
-    const groupedItems = groupItemsByOrganizer(data, alphabet);
+    const groupedItems = sortByProp
+      ? groupItemsByState(data, sortByProp, headerProp) // Group by state
+      : groupItemsByOrganizer(data, alphabet); // Group by alphabet
     const nonEmptySections = groupedItems.filter(
       (section) => section.data.length > 0
     );
     setFilteredSections(nonEmptySections);
 
     const newIndexMapping: { [key: string]: number } = {};
-    alphabet.forEach((letter) => {
+    const keys = sortByProp
+      ? groupedItems.map((section) => section.title)
+      : alphabet;
+
+    keys.forEach((key) => {
       const sectionIndex = nonEmptySections.findIndex(
-        (section) => section.title === letter
+        (section) => section.title === key
       );
       if (sectionIndex !== -1) {
-        newIndexMapping[letter] = sectionIndex;
+        newIndexMapping[key] = sectionIndex;
       } else {
-        newIndexMapping[letter] = -1;
+        newIndexMapping[key] = -1;
       }
     });
     setIndexMapping(newIndexMapping);
-  }, [data, alphabet]);
+  }, [data, alphabet, sortByProp]);
 
   /**
-   * Scroll to the section by letter
+   * Scroll to the section by letter or state first letter
    *
    * @param {GestureResponderEvent} event
    */
@@ -122,33 +137,12 @@ export const IOSContactList = ({
     }
   };
 
-  /**
-   * On viewable items changed
-   *
-   * @param {{ viewableItems: ViewToken[] }} { viewableItems }
-   */
-  // const onViewableItemsChanged = ({
-  //   viewableItems,
-  // }: {
-  //   viewableItems: ViewToken[];
-  // }) => {
-  //   const headers = viewableItems
-  //     .filter((item) => item.isViewable && item.section)
-  //     .map((item) => item.section.title);
-
-  //   LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-  //   setStickySectionHeader(headers[0]);
-  // };
-
   // Get item layout
   const _getItemLayout = sectionListGetItemLayout({
-    // The height of the row with rowData at the given sectionIndex and rowIndex
     getItemHeight: () => size.itemHeight,
-
-    // These three properties are optional
-    getSeparatorHeight: () => 0, // The height of your separators
-    getSectionHeaderHeight: () => size.sectionHeaderHeight + 30, // The height of your section headers
-    getSectionFooterHeight: () => 0, // The height of your section footers
+    getSeparatorHeight: () => 0,
+    getSectionHeaderHeight: () => size.sectionHeaderHeight + 30,
+    getSectionFooterHeight: () => 0,
   });
 
   return (
