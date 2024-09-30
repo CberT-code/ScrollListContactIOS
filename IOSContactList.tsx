@@ -145,6 +145,22 @@ export const IOSContactList = ({
     getSectionFooterHeight: () => 0,
   });
 
+  // Function to render item text with the first word in bold
+  const renderItemText = (text: string) => {
+    // Split the text at the first space
+    const [firstWord, ...restWords] = text.split(" ");
+    return (
+      <>
+        {/* First word in bold */}
+        <Text style={styles.itemBold}>{firstWord}</Text>
+        {/* Rest of the words in normal font */}
+        {restWords.length > 0 && (
+          <Text style={styles.item}> {restWords.join(" ")}</Text>
+        )}
+      </>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <SectionList
@@ -156,7 +172,9 @@ export const IOSContactList = ({
             style={styles.itemContainer}
             onPress={() => onItemPress(item)}
           >
-            <Text style={styles.item}>{item.name ? item.name : item.key}</Text>
+            <Text style={styles.item}>
+              {item.name ? renderItemText(item.name) : renderItemText(item.key)}
+            </Text>
           </TouchableOpacity>
         )}
         renderSectionHeader={({ section: { title } }) => (

@@ -1,5 +1,5 @@
-import { StyleSheet } from "react-native"
-import { size } from "./contants"
+import { StyleSheet } from "react-native";
+import { size } from "./contants";
 
 export const styles = StyleSheet.create({
   container: {
@@ -29,6 +29,9 @@ export const styles = StyleSheet.create({
     fontWeight: "600",
     paddingHorizontal: 10,
     textAlign: "left",
+  },
+  itemBold: {
+    fontWeight: "600",
   },
 
   // SectionHeader
@@ -60,4 +63,4 @@ export const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
   },
-})
+});
