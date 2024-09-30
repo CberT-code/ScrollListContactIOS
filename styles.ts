@@ -26,7 +26,7 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
   },
   item: {
-    fontWeight: "600",
+    fontWeight: "300",
     paddingHorizontal: 10,
     textAlign: "left",
   },
